@@ -1,0 +1,2 @@
+# swesyn
+Swedish Synonym Lookup
