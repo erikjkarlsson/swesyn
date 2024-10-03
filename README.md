@@ -12,6 +12,12 @@
 
  3. Type `C-c C-s` to interactively query synonym
 
+
+# Dependencies 
+
+ - Emacs compiled with `sqlite` support. 
+ - `ivy` 
+
 # Notes
 
 All rights to the synonym set `swesaurus.xml` goes to Språkbanken Text (see [^1])
