@@ -54,7 +54,7 @@
   (unless swesyn-db-connection
     (setq swesyn-db-connection (sqlite-open swesyn-db-path))))
 
-(defun swesyn-close-connection ()
+(defun swesyn-close-connection nil
   "Connect to the SQLite synonyms database."
   (when swesyn-db-connection
     (sqlite-close swesyn-db-path)))
@@ -68,8 +68,9 @@ Returns a list of synonyms as strings."
   (if result
       (split-string (caar result) "|")
     nil)))
+(provide 'swesyn-query-synonyms)
 
-(defun swesyn-insert-synonym ()
+(defun swesyn-insert-synonym nil
   "Interactively query for a synonym insert it at point."
   (interactive)
   
@@ -89,6 +90,43 @@ Returns a list of synonyms as strings."
                        (insert synonym)))))
       (message "No synonyms found for '%s'." current-word)))) 
 
+(provide 'swesyn-insert-synonym)
+
+(defun swesyn-add-new-synonym (word new-synonym)
+  "Add a `NEW-SYNONYM' for `WORD' in database."
+  
+  (swesyn-open-connection)
+
+  (let ((current-synonyms (swesyn-query-synonyms word)))
+    (if current-synonyms
+        ;; Append the new synonym
+        (let ((updated-synonyms
+               (string-join (append current-synonyms
+                                    (list new-synonym))
+                            "|")))          
+          (sqlite-execute swesyn-db-connection
+                           "UPDATE synonyms SET synonyms = ? WHERE word = ?;"
+                           (list updated-synonyms word))         
+          (message "Added synonym '%s' to the word '%s'." new-synonym word))
+      
+      ;; Create a new entry
+      (sqlite-execute swesyn-db-connection "INSERT INTO synonyms (word, synonyms) VALUES (?, ?);"
+                      (list word new-synonym))
+     (message "Inserted new word '%s' with synonym '%s'." word new-synonym))))
+
+(provide 'swesyn-add-new-synonym)
+
+(defun swesyn-new-synonym nil
+  "Interactively add a new synonym to the SQLite database.
+Prompts the user for a word and the new synonym."
+  (interactive)
+
+  (let ((word        (read-string "Word: "))
+        (new-synonym (read-string "New synonym: ")))
+    
+    (insert-new-synonym word new-synonym)))
+
+(provide 'swesyn-new-synonym)
 
 
 (defvar swesyn-mode-map (make-sparse-keymap)
@@ -109,7 +147,9 @@ that includes two columns: `word` and `synonyms`."
   :lighter " SweSyn"
   :after-hook (connect-to-synonyms-db)
   :before-hook (close-synonyms-db)
-  :keymap swesyn-mode-map)
+  :keymap swesyn-mode-map
+  (add-hook 'kill-buffer-hook
+            #'swesyn-close-connection))
 
 ;; (add-hook 'text-mode-hook 'swesyn-mode)
 
