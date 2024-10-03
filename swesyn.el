@@ -70,24 +70,23 @@ Returns a list of synonyms as strings."
     nil)))
 
 (defun swesyn-insert-synonym ()
-  "Interactively query for a synonym using Ivy and insert it at point."
-
+  "Interactively query for a synonym insert it at point."
   (interactive)
+  
   (let* ((current-word (thing-at-point 'word t))
          (selected-word (ivy-read  "Find synonyms for: " '()
-                                   :initial-input current-word))
-         
+                                   :initial-input current-word))         
          (synonyms (swesyn-query-synonyms selected-word)))
 
     (if synonyms
-        (ivy-read  "Select synonym: "
-                  synonyms
-                  :action (lambda (synonym)
-                            (when synonym
-                              (let ((bounds (bounds-of-thing-at-point 'word)))
-                                (when bounds
-                                    (delete-region (bounds-of-thing-at-point 'word)))
-                                (insert synonym)))))
+        (ivy-read
+         "Select synonym: " synonyms
+         :action (lambda (synonym)
+                   (when synonym
+                     (let ((bounds (bounds-of-thing-at-point 'word)))
+                       (when bounds
+                         (delete-region (bounds-of-thing-at-point 'word)))
+                       (insert synonym)))))
       (message "No synonyms found for '%s'." current-word)))) 
 
 
@@ -112,6 +111,7 @@ that includes two columns: `word` and `synonyms`."
   :before-hook (close-synonyms-db)
   :keymap swesyn-mode-map)
 
-; (add-hook 'text-mode-hook 'swesyn-mode)
+;; (add-hook 'text-mode-hook 'swesyn-mode)
+
 (provide 'swesyn)
 ;;; swedish-find-synonyms.el ends here
