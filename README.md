@@ -14,6 +14,6 @@
 
 # Notes
 
-All rights to the synonym set `swesaurus.xml` goes to Språkbanken Text (see [^1]
+All rights to the synonym set `swesaurus.xml` goes to Språkbanken Text (see [^1])
 # Footnotes
 [^1] Språkbanken Text. (2017-09-19). Swesaurus [Data set]. Språkbanken Text. [https://doi.org/10.23695/w5ww-x964]
